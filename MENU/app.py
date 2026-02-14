@@ -216,7 +216,8 @@ with col_main:
                         st.markdown(label_text)
 
                     if st.button("ดูสูตร", key=f"recipe_{recipe['id']}"):
-                        st.session_state[f"show_recipe_{recipe['id']}"] = True
+                       st.session_state.selected_recipe = recipe
+                       st.switch_page("pages/recipe_page.py")
 
                     # Show recipe details in expander
                     if st.session_state.get(f"show_recipe_{recipe['id']}", False):
