@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ผัดกะเพราไก่ - วัตถุดิบ</title>
+    <style>
+        :root {
+            --accent: #ef4444;
+            --cream: #fff7ed;
+            --brown: #7a4a2a;
+            --border: #ecd8c6;
+            --green: #16a34a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, Arial, sans-serif;
+            margin: 0;
+            color: var(--brown);
+            background: #fffdf9;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--cream), #fde68a);
+            border-bottom: 3px solid var(--accent);
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: #fffaf6;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 24px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+
+        .info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quantity {
+            background: var(--accent);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        @media (max-width:600px) {
+            header h1 { font-size: 22px; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🍗 ผัดกะเพราไก่ 🌿</h1>
+</header>
+
+<div class="container">
+
+    <div class="section">
+        <h2>📋 วัตถุดิบหลัก</h2>
+        <div class="grid">
+
+            <div class="card">
+                <div class="icon">🍗</div>
+                <div class="info">
+                    <h3>เนื้อไก่สับ</h3>
+                    <p><span class="quantity">300 กรัม</span></p>
+                    <p>ใช้เนื้อสะโพกหรืออกไก่ตามชอบ</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon">🌿</div>
+                <div class="info">
+                    <h3>ใบกะเพรา</h3>
+                    <p><span class="quantity">1 ถ้วย</span></p>
+                    <p>ล้างสะอาดและเด็ดใบ</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon">🌶️</div>
+                <div class="info">
+                    <h3>พริกสด</h3>
+                    <p><span class="quantity">5-10 เม็ด</span></p>
+                    <p>โขลกหยาบตามระดับความเผ็ดที่ต้องการ</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon">🧄</div>
+                <div class="info">
+                    <h3>กระเทียม</h3>
+                    <p><span class="quantity">4-5 กลีบ</span></p>
+                    <p>โขลกรวมกับพริก</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🧂 เครื่องปรุง</h2>
+        <div class="grid">
+
+            <div class="card">
+                <div class="icon">🧂</div>
+                <div class="info">
+                    <h3>น้ำปลา</h3>
+                    <p><span class="quantity">1-2 ช้อนโต๊ะ</span></p>
+                    <p>ปรุงรสเค็ม</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon">🍯</div>
+                <div class="info">
+                    <h3>น้ำตาล</h3>
+                    <p><span class="quantity">1 ช้อนชา</span></p>
+                    <p>เพิ่มความกลมกล่อม</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="icon">🥄</div>
+                <div class="info">
+                    <h3>ซีอิ๊วขาว</h3>
+                    <p><span class="quantity">1 ช้อนโต๊ะ</span></p>
+                    <p>เพิ่มรสชาติให้เข้มข้น</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📖 วิธีการทำ</h2>
+        <ul>
+            <li>ตั้งกระทะใส่น้ำมันเล็กน้อย ใช้ไฟกลาง</li>
+            <li>ผัดพริกและกระเทียมจนหอม</li>
+            <li>ใส่เนื้อไก่สับ ผัดจนสุกทั่ว</li>
+            <li>ปรุงรสด้วยน้ำปลา ซีอิ๊วขาว และน้ำตาล</li>
+            <li>ใส่ใบกะเพรา ผัดเร็ว ๆ แล้วปิดไฟทันที</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
