@@ -1,251 +1,80 @@
 import streamlit as st
 
-st.set_page_config(page_title="เมนูวันนี้ จากวัตถุดิบที่มี", layout="wide")
+st.set_page_config(page_title="รายละเอียดสูตร", layout="wide")
 
 # =========================
-# 📦 DATA
+# 🔒 ตรวจว่ามีสูตรไหม
 # =========================
-RECIPES = [
-    {
-        "id": 1,
-        "name": "ผัดกระเพรา",
-        "base_ingredients": ["กระเพรา", "พริก", "กระเทียม"],
-        "protein_options": [
-            "ไก่สับ",
-            "หมูสับ",
-            "หมูกรอบ",
-            "เนื้อ",
-            "ทะเล",
-            "เครื่องในไก่",
-        ],
-        "images": {
-            "default": "",
-            "ไก่สับ": "",
-            "หมูสับ": "",
-            "หมูกรอบ": "",
-        },
-        "type": "ผัด",
-        "difficulty": "ง่าย",
-        "time": "15–30",
-        "steps": [
-            "โขลกพริกกับกระเทียม",
-            "ผัดพริกกระเทียมกับน้ำมันจนหอม",
-            "ใส่เนื้อสัตว์ที่เลือก ผัดให้สุก",
-            "ปรุงรสตามชอบ",
-            "ใส่ใบกระเพรา ผัดเร็ว ๆ แล้วปิดไฟ",
-        ],
-    },
-    {
-        "id": 2,
-        "name": "ต้มยำกุ้ง",
-        "base_ingredients": ["กุ้ง", "ตะไคร้", "มะนาว"],
-        "protein_options": [],
-        "images": {
-            "default": "",
-        },
-        "type": "ต้ม",
-        "difficulty": "กลาง",
-        "time": "15–30",
-        "steps": [
-            "ต้มน้ำให้เดือด",
-            "ใส่ตะไคร้และสมุนไพร",
-            "ใส่กุ้ง ต้มจนสุก",
-            "ปรุงรสด้วยน้ำปลาและมะนาว",
-            "โรยผักชีแล้วเสิร์ฟ",
-        ],
-    },
-    {
-        "id": 3,
-        "name": "ต้มข่าไก่",
-        "base_ingredients": 
-        ["เนื้อไก่ (ส่วนที่ชอบ เช่น อกไก่ สะโพก น่องไก่ ฯลฯ)", "ข่า", "น้ำมะขามเปียก", "กะทิ",
-        "ตะไคร้", "ใบมะกรูด", "หอมแดง", "พริกชี้ฟ้า","ผักชี", "เห็ดฟาง"],
-        "protein_options": [],
-        "images": {
-            "default": "images/ต้มข่าไก่.jpg",
-        },
-        "type": "ต้ม",
-        "difficulty": "ยาก",
-        "time": "15–30",
-        "steps": [
-            "ต้มน้ำ ใส่ข่า ตะไคร้ ใบมะกรูด และพริก รอจนเดือดและหอม",
-            "ใส่เนื้อไก่ลงไป ต้มจนเดือดอีกครั้ง",
-            "ลดไฟลง ปรุงรสด้วยน้ำปลาและน้ำตาลทรายและน้ำมะขามเปียก ชิมรสตามชอบ",
-            "ใส่กะทิลงไป ตามด้วยเห็ด ต้มจนเดือดแล้วปิดไฟ พร้อมเสิร์ฟ",
-        ],
-    },    
-]
+if "selected_recipe" not in st.session_state:
+    st.warning("ไม่พบสูตรที่เลือก")
+    st.stop()
 
-START_ING = [
-    "หมู","ไก่","ไข่","เห็ดเข็มทอง","ผักกาด","ข้าว","เต้าหู้","กุ้ง","ปลา","วุ้นเส้น","มะนาว",
-    "ตะไคร้","ขิง","ตับไก่","ตับหมู","กะทิ","มะเขือเทศ","มะเขือเปราะ","กระเพรา","พริก","กระเทียม",
-    "โหรพา","หอมหัวใหญ่","แครอท","ถั่วฝักยาว","หอมแดง","ใบมะกรูด","พริกแห้ง","ผักคะน้า","ผักบุ้ง",
-    "แตงกวา","กระชาย","ฟักทอง","มันฝรั่ง","มะเขือยาว","สะตอ","ผักหวาน","กระเจี๊ยบเขียว",
-    "พริกหวาน","นมจืด","พริกหยวก","พริกหนุ่ม"
-]
+recipe = st.session_state.selected_recipe
 
 # =========================
-# 🧠 SESSION STATE
-# =========================
-if "ingredients" not in st.session_state:
-    st.session_state.ingredients = set(START_ING)
-
-if "selected" not in st.session_state:
-    st.session_state.selected = set()
-
-if "filters" not in st.session_state:
-    st.session_state.filters = {"type": "", "difficulty": "", "time": ""}
-
-if "name_query" not in st.session_state:
-    st.session_state.name_query = ""
-
-# =========================
-# 🖼 IMAGE HELPER
+# 🖼 helper เลือกรูปตามโปรตีน
 # =========================
 def get_recipe_image(recipe):
-    selected = st.session_state.selected
+    selected = st.session_state.get("selected", set())
+
     for protein in recipe.get("protein_options", []):
         if protein in selected:
-            return recipe["images"].get(protein, recipe["images"]["default"])
+            return recipe["images"].get(
+                protein,
+                recipe["images"]["default"]
+            )
+
     return recipe["images"]["default"]
 
 # =========================
-# 🎯 MATCH LOGIC
+# 🎨 HEADER
 # =========================
-def matches(recipe):
-    f = st.session_state.filters
-    selected = st.session_state.selected
-
-    if f["type"] and recipe["type"] != f["type"]:
-        return False
-    if f["difficulty"] and recipe["difficulty"] != f["difficulty"]:
-        return False
-    if f["time"] and recipe["time"] != f["time"]:
-        return False
-
-    if st.session_state.name_query:
-        q = st.session_state.name_query
-        searchable = (
-            [recipe["name"]]
-            + recipe.get("base_ingredients", [])
-            + recipe.get("protein_options", [])
-        )
-        if not any(q in s.lower() for s in searchable):
-            return False
-
-    selected_base = [
-        s for s in selected if s not in recipe.get("protein_options", [])
-    ]
-    selected_protein = [
-        s for s in selected if s in recipe.get("protein_options", [])
-    ]
-
-    base_match = all(
-        any(sb.lower() == ing.lower() for ing in recipe["base_ingredients"])
-        for sb in selected_base
-    )
-
-    if recipe.get("protein_options"):
-        protein_match = (
-            True if not selected_protein
-            else any(p in recipe["protein_options"] for p in selected_protein)
-        )
-    else:
-        protein_match = True
-
-    return base_match and protein_match
+st.title(recipe["name"])
+st.image(get_recipe_image(recipe), use_column_width=True)
 
 # =========================
-# ⭐ MATCH SCORE
+# 📋 ข้อมูลทั่วไป
 # =========================
-def match_score(recipe):
-    selected = st.session_state.selected
-    if not selected:
-        return 0
+st.subheader("ข้อมูลทั่วไป")
 
-    all_ings = (
-        recipe.get("base_ingredients", [])
-        + recipe.get("protein_options", [])
-    )
+col1, col2, col3 = st.columns(3)
 
-    match_count = sum(
-        1 for sel in selected
-        if any(sel.lower() == ing.lower() for ing in all_ings)
-    )
+with col1:
+    st.write(f"ประเภท: {recipe['type']}")
 
-    return match_count / len(selected)
+with col2:
+    st.write(f"เวลา: {recipe['time']}")
+
+with col3:
+    st.write(f"ระดับความยาก: {recipe['difficulty']}")
 
 # =========================
-# 🎨 UI
+# 🧺 วัตถุดิบ
 # =========================
-st.title("🍽️ เมนูวันนี้ จากวัตถุดิบที่มี")
+st.subheader("วัตถุดิบ")
 
-search_val = st.text_input("พิมพ์ชื่อเมนูหรือวัตถุดิบ")
-if search_val:
-    st.session_state.name_query = search_val.lower()
+# base ingredients
+st.markdown("**วัตถุดิบหลัก**")
+for ing in recipe.get("base_ingredients", []):
+    st.write("•", ing)
 
-col_sidebar, col_main = st.columns([1, 3])
-
-# =========================
-# 🧺 SIDEBAR
-# =========================
-with col_sidebar:
-    st.subheader("วัตถุดิบ")
-
-    sorted_ings = sorted(list(st.session_state.ingredients))
-    selected_ings = st.multiselect(
-        "เลือกวัตถุดิบ",
-        sorted_ings,
-        default=list(st.session_state.selected),
-        label_visibility="collapsed",
-    )
-    st.session_state.selected = set(selected_ings)
-
-    st.divider()
-    st.subheader("ตัวกรอง")
-
-    st.session_state.filters["type"] = st.selectbox(
-        "ประเภทอาหาร", ["", "ต้ม", "ผัด", "แกง", "ทอด", "ยำ", "นึ่ง"]
-    )
-
-    col_diff, col_time = st.columns(2)
-
-    with col_diff:
-        st.session_state.filters["difficulty"] = st.selectbox(
-            "ระดับความยาก", ["", "ง่าย", "กลาง", "ยาก"]
-        )
-
-    with col_time:
-        st.session_state.filters["time"] = st.selectbox(
-            "เวลา", ["", "<15", "15–30", ">30"]
-        )
+# protein options
+if recipe.get("protein_options"):
+    st.markdown("**โปรตีนที่ใช้ได้**")
+    for p in recipe["protein_options"]:
+        st.write("•", p)
 
 # =========================
-# 🍽 MAIN
+# 👨‍🍳 วิธีทำ
 # =========================
-with col_main:
-    filtered = [r for r in RECIPES if matches(r)]
-    results = sorted(filtered, key=lambda r: match_score(r), reverse=True)
+if recipe.get("steps"):
+    st.subheader("วิธีทำ")
 
-    st.subheader(f"ผลลัพธ์สูตร ({len(results)} รายการ)")
+    for i, step in enumerate(recipe["steps"], start=1):
+        st.write(f"{i}. {step}")
 
-    if not results:
-        st.info("ไม่พบสูตรที่ตรงกับเงื่อนไข")
-
-    cols = st.columns(3)
-    for idx, recipe in enumerate(results):
-        with cols[idx % 3]:
-            with st.container(border=True):
-                st.image(get_recipe_image(recipe), use_column_width=True)
-                st.subheader(recipe["name"])
-                st.caption(f"{recipe['type']} · {recipe['time']}")
-
-                # 📖 วิธีทำ
-                with st.expander("📖 วิธีทำ"):
-                    for i, step in enumerate(recipe.get("steps", []), start=1):
-                        st.write(f"{i}. {step}")
-
-                score = match_score(recipe)
-                if st.session_state.selected:
-                    st.progress(score)
-                    st.caption(f"ตรงวัตถุดิบ {score*100:.0f}%")
+# =========================
+# 🔙 ปุ่มกลับ
+# =========================
+if st.button("⬅ กลับหน้าหลัก"):
+    st.switch_page("app.py")
