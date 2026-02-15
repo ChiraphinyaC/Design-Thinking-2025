@@ -15,7 +15,7 @@ RECIPES = [
         "ตะไคร้", "ใบมะกรูด", "หอมแดง", "พริกชี้ฟ้า","ผักชี", "เห็ดฟาง"],
         "protein_options": [],
         "images": {
-            "default": "images/ต้มข่าไก่.jpg",
+            "default": "image/ต้มข่าไก่.jpg",
         },
         "type": "ต้ม",
         "difficulty": "ยาก",
