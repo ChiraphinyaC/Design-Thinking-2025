@@ -19,10 +19,10 @@ RECIPES = [
             "เครื่องในไก่",
         ],
         "images": {
-            "default": "images/krapao_default.jpg",
-            "ไก่สับ": "images/krapao_chicken.jpg",
-            "หมูสับ": "images/krapao_pork.jpg",
-            "หมูกรอบ": "images/krapao_crispy_pork.jpg",
+            "default": "",
+            "ไก่สับ": "",
+            "หมูสับ": "",
+            "หมูกรอบ": "",
         },
         "type": "ผัด",
         "difficulty": "ง่าย",
@@ -41,7 +41,7 @@ RECIPES = [
         "base_ingredients": ["กุ้ง", "ตะไคร้", "มะนาว"],
         "protein_options": [],
         "images": {
-            "default": "images/tom_yum_goong.jpg",
+            "default": "",
         },
         "type": "ต้ม",
         "difficulty": "กลาง",
