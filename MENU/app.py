@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 
 st.set_page_config(page_title="เมนูวันนี้ จากวัตถุดิบที่มี", layout="wide")
 
@@ -32,8 +31,8 @@ RECIPES = [
         "steps": [
             "ต้มน้ำ ใส่ข่า ตะไคร้ ใบมะกรูด และพริก รอจนเดือดและหอม",
             "ใส่เนื้อไก่ลงไป ต้มจนเดือดอีกครั้ง",
-            "ลดไฟลง ปรุงรสด้วยน้ำปลา น้ำตาล และน้ำมะขามเปียก ชิมรสตามชอบ",
-            "ใส่กะทิลงไป ตามด้วยเห็ด ต้มจนเดือดแล้วปิดไฟ พร้อมเสิร์ฟ",
+            "ลดไฟลง ปรุงรสด้วยน้ำปลา น้ำตาล และน้ำมะขามเปียก",
+            "ใส่กะทิ ตามด้วยเห็ด ต้มจนเดือดแล้วปิดไฟ พร้อมเสิร์ฟ",
         ],
     },
 ]
@@ -62,23 +61,14 @@ if "name_query" not in st.session_state:
     st.session_state.name_query = ""
 
 # =========================
-# 🖼 IMAGE HELPER (กันรูปพัง)
+# 🖼 IMAGE HELPER
 # =========================
-def safe_image(path: str):
-    if not path:
-        return None
-    if path.startswith("http"):
-        return path
-    if os.path.exists(path):
-        return path
-    return None
-
 def get_recipe_image(recipe):
     selected = st.session_state.selected
     for protein in recipe.get("protein_options", []):
         if protein in selected:
-            return safe_image(recipe["images"].get(protein))
-    return safe_image(recipe["images"].get("default"))
+            return recipe["images"].get(protein, recipe["images"]["default"])
+    return recipe["images"]["default"]
 
 # =========================
 # 🎯 MATCH LOGIC
@@ -95,7 +85,7 @@ def matches(recipe):
         return False
 
     if st.session_state.name_query:
-        q = st.session_state.name_query.lower()
+        q = st.session_state.name_query
         searchable = (
             [recipe["name"]]
             + recipe.get("base_ingredients", [])
@@ -112,7 +102,7 @@ def matches(recipe):
     ]
 
     base_match = all(
-        any(sb.lower() in ing.lower() for ing in recipe["base_ingredients"])
+        any(sb.lower() == ing.lower() for ing in recipe["base_ingredients"])
         for sb in selected_base
     )
 
@@ -141,7 +131,7 @@ def match_score(recipe):
 
     match_count = sum(
         1 for sel in selected
-        if any(sel.lower() in ing.lower() for ing in all_ings)
+        if any(sel.lower() == ing.lower() for ing in all_ings)
     )
 
     return match_count / len(selected)
@@ -151,8 +141,14 @@ def match_score(recipe):
 # =========================
 st.title("🍽️ เมนูวันนี้ จากวัตถุดิบที่มี")
 
-search_val = st.text_input("พิมพ์ชื่อเมนูหรือวัตถุดิบ")
-st.session_state.name_query = search_val.lower() if search_val else ""
+# 🔍 SEARCH (นิ่งแล้ว)
+search_val = st.text_input(
+    "พิมพ์ชื่อเมนูหรือวัตถุดิบ",
+    key="search_box"
+)
+
+if search_val != st.session_state.name_query:
+    st.session_state.name_query = search_val.lower()
 
 col_sidebar, col_main = st.columns([1, 3])
 
@@ -168,26 +164,35 @@ with col_sidebar:
         sorted_ings,
         default=list(st.session_state.selected),
         label_visibility="collapsed",
+        key="ingredient_select",
     )
-    st.session_state.selected = set(selected_ings)
+
+    if set(selected_ings) != st.session_state.selected:
+        st.session_state.selected = set(selected_ings)
 
     st.divider()
     st.subheader("ตัวกรอง")
 
     st.session_state.filters["type"] = st.selectbox(
-        "ประเภทอาหาร", ["", "ต้ม", "ผัด", "แกง", "ทอด", "ยำ", "นึ่ง"]
+        "ประเภทอาหาร",
+        ["", "ต้ม", "ผัด", "แกง", "ทอด", "ยำ", "นึ่ง"],
+        key="filter_type",
     )
 
     col_diff, col_time = st.columns(2)
 
     with col_diff:
         st.session_state.filters["difficulty"] = st.selectbox(
-            "ระดับความยาก", ["", "ง่าย", "กลาง", "ยาก"]
+            "ระดับความยาก",
+            ["", "ง่าย", "กลาง", "ยาก"],
+            key="filter_diff",
         )
 
     with col_time:
         st.session_state.filters["time"] = st.selectbox(
-            "เวลา", ["", "<15", "15–30", ">30"]
+            "เวลา",
+            ["", "<15", "15–30", ">30"],
+            key="filter_time",
         )
 
 # =========================
@@ -206,16 +211,11 @@ with col_main:
     for idx, recipe in enumerate(results):
         with cols[idx % 3]:
             with st.container(border=True):
-
-                img = get_recipe_image(recipe)
-                if img:
-                    st.image(img, width="stretch")
-                else:
-                    st.warning("⚠️ ไม่พบรูปภาพ")
-
+                st.image(get_recipe_image(recipe), width="stretch")
                 st.subheader(recipe["name"])
                 st.caption(f"{recipe['type']} · {recipe['time']}")
 
+                # 📖 วิธีทำ
                 with st.expander("📖 วิธีทำ"):
                     for i, step in enumerate(recipe.get("steps", []), start=1):
                         st.write(f"{i}. {step}")
