@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 st.set_page_config(page_title="เมนูวันนี้ จากวัตถุดิบที่มี", layout="wide")
 
@@ -7,12 +8,20 @@ st.set_page_config(page_title="เมนูวันนี้ จากวัต
 # =========================
 RECIPES = [
     {
-        
         "id": 3,
         "name": "ต้มข่าไก่",
-        "base_ingredients": 
-        ["เนื้อไก่ (ส่วนที่ชอบ เช่น อกไก่ สะโพก น่องไก่ ฯลฯ)", "ข่า", "น้ำมะขามเปียก", "กะทิ",
-        "ตะไคร้", "ใบมะกรูด", "หอมแดง", "พริกชี้ฟ้า","ผักชี", "เห็ดฟาง"],
+        "base_ingredients": [
+            "เนื้อไก่ (ส่วนที่ชอบ เช่น อกไก่ สะโพก น่องไก่ ฯลฯ)",
+            "ข่า",
+            "น้ำมะขามเปียก",
+            "กะทิ",
+            "ตะไคร้",
+            "ใบมะกรูด",
+            "หอมแดง",
+            "พริกชี้ฟ้า",
+            "ผักชี",
+            "เห็ดฟาง",
+        ],
         "protein_options": [],
         "images": {
             "default": "image/ต้มข่าไก่.jpg",
@@ -23,10 +32,10 @@ RECIPES = [
         "steps": [
             "ต้มน้ำ ใส่ข่า ตะไคร้ ใบมะกรูด และพริก รอจนเดือดและหอม",
             "ใส่เนื้อไก่ลงไป ต้มจนเดือดอีกครั้ง",
-            "ลดไฟลง ปรุงรสด้วยน้ำปลาและน้ำตาลทรายและน้ำมะขามเปียก ชิมรสตามชอบ",
+            "ลดไฟลง ปรุงรสด้วยน้ำปลา น้ำตาล และน้ำมะขามเปียก ชิมรสตามชอบ",
             "ใส่กะทิลงไป ตามด้วยเห็ด ต้มจนเดือดแล้วปิดไฟ พร้อมเสิร์ฟ",
         ],
-    },    
+    },
 ]
 
 START_ING = [
@@ -53,14 +62,23 @@ if "name_query" not in st.session_state:
     st.session_state.name_query = ""
 
 # =========================
-# 🖼 IMAGE HELPER
+# 🖼 IMAGE HELPER (กันรูปพัง)
 # =========================
+def safe_image(path: str):
+    if not path:
+        return None
+    if path.startswith("http"):
+        return path
+    if os.path.exists(path):
+        return path
+    return None
+
 def get_recipe_image(recipe):
     selected = st.session_state.selected
     for protein in recipe.get("protein_options", []):
         if protein in selected:
-            return recipe["images"].get(protein, recipe["images"]["default"])
-    return recipe["images"]["default"]
+            return safe_image(recipe["images"].get(protein))
+    return safe_image(recipe["images"].get("default"))
 
 # =========================
 # 🎯 MATCH LOGIC
@@ -77,7 +95,7 @@ def matches(recipe):
         return False
 
     if st.session_state.name_query:
-        q = st.session_state.name_query
+        q = st.session_state.name_query.lower()
         searchable = (
             [recipe["name"]]
             + recipe.get("base_ingredients", [])
@@ -94,7 +112,7 @@ def matches(recipe):
     ]
 
     base_match = all(
-        any(sb.lower() == ing.lower() for ing in recipe["base_ingredients"])
+        any(sb.lower() in ing.lower() for ing in recipe["base_ingredients"])
         for sb in selected_base
     )
 
@@ -123,7 +141,7 @@ def match_score(recipe):
 
     match_count = sum(
         1 for sel in selected
-        if any(sel.lower() == ing.lower() for ing in all_ings)
+        if any(sel.lower() in ing.lower() for ing in all_ings)
     )
 
     return match_count / len(selected)
@@ -134,8 +152,7 @@ def match_score(recipe):
 st.title("🍽️ เมนูวันนี้ จากวัตถุดิบที่มี")
 
 search_val = st.text_input("พิมพ์ชื่อเมนูหรือวัตถุดิบ")
-if search_val:
-    st.session_state.name_query = search_val.lower()
+st.session_state.name_query = search_val.lower() if search_val else ""
 
 col_sidebar, col_main = st.columns([1, 3])
 
@@ -189,11 +206,16 @@ with col_main:
     for idx, recipe in enumerate(results):
         with cols[idx % 3]:
             with st.container(border=True):
-                st.image(get_recipe_image(recipe), width="stretch")
+
+                img = get_recipe_image(recipe)
+                if img:
+                    st.image(img, width="stretch")
+                else:
+                    st.warning("⚠️ ไม่พบรูปภาพ")
+
                 st.subheader(recipe["name"])
                 st.caption(f"{recipe['type']} · {recipe['time']}")
 
-                # 📖 วิธีทำ
                 with st.expander("📖 วิธีทำ"):
                     for i, step in enumerate(recipe.get("steps", []), start=1):
                         st.write(f"{i}. {step}")
