@@ -189,7 +189,7 @@ with col_main:
     for idx, recipe in enumerate(results):
         with cols[idx % 3]:
             with st.container(border=True):
-                st.image(get_recipe_image(recipe), use_column_width=True)
+                st.image(get_recipe_image(recipe), width="stretch")
                 st.subheader(recipe["name"])
                 st.caption(f"{recipe['type']} · {recipe['time']}")
 
