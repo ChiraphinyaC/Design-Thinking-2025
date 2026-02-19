@@ -13,7 +13,7 @@ def scrape_kapook(url):
     title = soup.find("h1")
     recipe_name = title.get_text(strip=True) if title else "ไม่พบชื่อสูตร"
  
-    # ดึงวัตถุดิบ (แบบกว้างก่อน เดี๋ยวปรับให้แม่นทีหลัง)
+    # ดึงวัตถุดิบ
     ingredients = []
  
     for li in soup.find_all("li"):
