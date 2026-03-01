@@ -1,3 +1,5 @@
+#scrape_runner.py : ตัว “รันเก็บข้อมูลจำนวนมาก”
+#หน้าที่ ดึงหลายสูตรจาก Kapook วนลูปหลาย URL บันทึก CSV สร้าง dataset
 import requests
 import pandas as pd
 import time
