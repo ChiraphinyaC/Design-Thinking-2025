@@ -1,3 +1,4 @@
+#scraper.py : ตัวดึงข้อมูล (core function) หน้าที่ดึง 1 สูตร เป็นฟังก์ชัน reusable
 import requests
 from bs4 import BeautifulSoup
 
