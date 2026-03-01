@@ -1,3 +1,5 @@
+#test_scrape.py : ตัวทดสอบสูตรเดียว
+#หน้าที่ debug scraper เช็กว่า selector ยังใช้ได้ไหม
 from scraper import scrape_kapook
 
 url = "https://cooking.kapook.com/view273026.html"
